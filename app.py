@@ -31,7 +31,6 @@ def extrair_estab(texto):
 # MOTOR DE PROCESSAMENTO
 # =========================
 def processar_arquivo(arquivo_enviado):
-    # Lê o arquivo diretamente da memória enviada pelo usuário
     df = pd.read_excel(arquivo_enviado, header=None)
     
     dados_eventos = []
@@ -67,6 +66,10 @@ def processar_arquivo(arquivo_enviado):
                 secao = re.search(r"\d+\.\d+\.\d+\.\d+", texto)
                 secao = secao.group() if secao else ""
 
+                # ---> O CÓDIGO QUE FALTAVA ESTÁ AQUI <---
+                try: funcao = texto.split(data_adm)[-1].split(secao)[0].strip()
+                except: funcao = ""
+
                 try:
                     linha2 = " ".join([str(x) for x in df.iloc[i+1].values])
                     cpf_match = re.search(r"CPF:\s*([\d\.\-]+)", linha2)
@@ -94,7 +97,7 @@ def processar_arquivo(arquivo_enviado):
                         j += 1
                         continue
 
-                    # Proventos e Descontos... (Lógica simplificada para caber aqui)
+                    # Proventos 
                     try:
                         if eh_numero(linha_ev[0]) or eh_numero(linha_ev[1]):
                             if eh_numero(linha_ev[0]):
@@ -112,6 +115,7 @@ def processar_arquivo(arquivo_enviado):
                                 dados_eventos.append({"estab": estab_atual, "matricula": matricula, "nome": nome, "cpf": cpf, "funcao": funcao, "secao": secao, "evento": evento, "descricao": descricao, "refer": referencia, "valor": valor, "tipo": "PROVENTO"})
                     except: pass
 
+                    # Descontos 
                     try:
                         if eh_numero(linha_ev[7]) or eh_numero(linha_ev[8]):
                             if eh_numero(linha_ev[7]):
@@ -136,7 +140,6 @@ def processar_arquivo(arquivo_enviado):
     df_eventos_final = pd.DataFrame(dados_eventos)
     df_func_final = pd.DataFrame(dados_funcionarios).drop_duplicates(subset=["estab", "matricula"])
 
-    # Salva na memória em vez de no disco
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         if not df_eventos_final.empty: df_eventos_final.to_excel(writer, sheet_name="Eventos", index=False)
@@ -149,7 +152,7 @@ def processar_arquivo(arquivo_enviado):
 # =========================
 st.set_page_config(page_title="Extrator de Folhas - TOTVS", page_icon="📄")
 
-st.title("📄 Extrator de Folha de Adiantamento")
+st.title("📄 Extrator de Folha")
 st.write("Envie os seus arquivos Excel originais. O sistema irá extrair os dados e devolver um formato limpo para análise.")
 
 arquivos_enviados = st.file_uploader("Arraste e solte os arquivos Excel aqui", type=["xlsx", "xls"], accept_multiple_files=True)
@@ -174,7 +177,6 @@ if arquivos_enviados:
             if arquivos_processados:
                 st.success("🎉 Processamento concluído com sucesso!")
                 
-                # Se for apenas 1 ficheiro
                 if len(arquivos_processados) == 1:
                     nome_arquivo = list(arquivos_processados.keys())[0]
                     dados = arquivos_processados[nome_arquivo]
@@ -184,7 +186,6 @@ if arquivos_enviados:
                         file_name=nome_arquivo,
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
-                # Se forem vários, cria um ficheiro ZIP
                 else:
                     zip_buffer = io.BytesIO()
                     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
