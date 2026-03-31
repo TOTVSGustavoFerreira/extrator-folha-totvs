@@ -15,4 +15,4 @@ st.info("🧮 **3. Extrator Bases PDF:** Extrai as BASES DE CÁLCULO de folhas g
 st.info("🧮 **4. Extrator Bases EXCEL:** Extrai as BASES DE CÁLCULO de folhas geradas (FORTES) em .xlsx e .xls.")
 
 st.write("---")
-st.caption("Desenvolvido para a equipe TOTVS.")
+st.caption("Desenvolvido por Carlos Gustavo.")
