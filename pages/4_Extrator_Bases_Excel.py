@@ -135,7 +135,7 @@ def processar_bases_excel(arquivo_enviado):
 st.set_page_config(page_title="Extrator Totais Excel - TOTVS", page_icon="🧾")
 
 st.title("🧾 Extrator de Bases e Totais (Excel)")
-st.write("Envie os ficheiros Excel (.xlsx). O sistema irá extrair a consolidação final (Proventos, Descontos, Líquido e Bases) numa única linha por funcionário.")
+st.write("Envie os ficheiros Excel (.xlsx). O sistema irá extrair a consolidação final (Bases) numa única linha por funcionário.")
 
 arquivos_enviados = st.file_uploader("Arraste e solte os ficheiros Excel aqui", type=["xlsx", "xls"], accept_multiple_files=True)
 
